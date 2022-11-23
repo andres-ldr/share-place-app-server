@@ -59,8 +59,13 @@ const createPlace = (req, res, next) => {
 };
 
 const updatePlace = (req, res, next) => {
+  const errors = validationResult(req);
   const { title, description } = req.body;
   const placeId = req.params.pid;
+
+  if (!errors.isEmpty()) {
+    throw new HttpError("Invalid inputs passed, please your data", 422);
+  }
 
   //create our data's copy
   const updatedPlace = { ...DUMMY_PLACES.find((p) => p.id === placeId) };
