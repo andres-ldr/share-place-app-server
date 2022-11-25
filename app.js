@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 
 const placesRoutes = require("./routes/places");
 const usersRoutes = require("./routes/users");
@@ -11,7 +12,7 @@ app.use(bodyParser.json());
 
 app.use("/api/places", placesRoutes);
 
-app.use("/api/users", usersRoutes)
+app.use("/api/users", usersRoutes);
 
 app.use((req, res, next) => {
   const error = new HttpError("Could not find this route.", 404);
@@ -26,4 +27,12 @@ app.use((error, req, res, next) => {
   res.json({ message: error.message || "An unknown error occurred!" });
 });
 
-app.listen(5000);
+mongoose
+  .connect('mongodb+srv://andres:PosVjzT8rqAKyCFI@cluster0.237ammu.mongodb.net/places?retryWrites=true&w=majority')
+  .then(() => {
+    app.listen(5000);
+  })
+  .catch(err =>{
+    console.log(err);
+  });
+
