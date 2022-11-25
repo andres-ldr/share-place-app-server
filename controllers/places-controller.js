@@ -1,6 +1,7 @@
 const HttpError = require("../models/http-error");
 const { v4: uuidv4 } = require("uuid");
 const { validationResult } = require("express-validator");
+const Place = require("../models/place");
 
 let DUMMY_PLACES = [
   {
@@ -37,7 +38,7 @@ const getPlacesByUserId = (req, res, next) => {
   res.json({ place: places });
 };
 
-const createPlace = (req, res, next) => {
+const createPlace = async (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
@@ -45,16 +46,23 @@ const createPlace = (req, res, next) => {
   }
 
   const { title, description, coordinates, address, creator } = req.body;
-  const createdPlace = {
-    id: uuidv4(),
+  const createdPlace = new Place({
     title,
     description,
-    location: coordinates,
     address,
+    location: coordinates,
+    image:
+      "https://imgs.search.brave.com/SnvWNEOd2lWjt1L_dbLKgbHT5AOjOjpd44R0HYlko5I/rs:fit:800:1200:1/g:ce/aHR0cDovLzQuYnAu/YmxvZ3Nwb3QuY29t/Ly1LeURLdU5XYWIz/Yy9UYjFmYU9Vd3c3/SS9BQUFBQUFBQUZL/Yy95amREbTF5LWw2/by9zMTYwMC9lbXBp/cmUlMkJzdGF0ZS0l/MkJidWlsZGluZyUy/QjIuanBn",
     creator,
-  };
+  });
+  
+  try {
+    await createdPlace.save();
+  } catch (err) {
+    const error = new HttpError("Creating place failed, try again", 500);
+    return next(error);
+  }
 
-  DUMMY_PLACES.push(createdPlace);
   res.status(201).json({ place: createdPlace });
 };
 
