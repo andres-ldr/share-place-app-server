@@ -34,7 +34,7 @@ const getPlaceById = async (req, res, next) => {
       "Could not find a place for the provided id.",
       404
     );
-    next(error);
+    return next(error);
   }
 
   res.json({ place: place.toObject({ getters: true }) });
