@@ -8,9 +8,9 @@ const userSchema = new Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true, minlength: 6 },
   image: { type: String, required: true },
-  places: { type: String, required: true },
+  places: [{ type: mongoose.Types.ObjectId, require: true, ref: "Place" }],
 });
 
 userSchema.plugin(uniqueValidator);
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model("User", userSchema);
