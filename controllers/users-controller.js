@@ -12,14 +12,14 @@ let DUMMY_USERS = [
   },
 ];
 
-const getUsers = (req, res, next) => {
-  const users = DUMMY_USERS;
-
-  if (!users || users.length === 0) {
-    return next(new HttpError("There's not users.", 404));
+const getUsers = async (req, res, next) => {
+  let users;
+  try {
+    users = await User.find({}, "-password");
+  } catch (err) {
+    next(new HttpError("Fetching users fails, please try again later.", 500));
   }
-
-  res.json({ users });
+  res.json({ Users: users.map((user) => user.toObject({ getters: true })) });
 };
 
 const signup = async (req, res, next) => {
