@@ -3,7 +3,8 @@ const { v4: uuidv4 } = require("uuid");
 const { validationResult } = require("express-validator");
 const Place = require("../models/place");
 const getCoordsForAddress = require("../Util/location");
-const { HttpStatusCode } = require("axios");
+const User = require("../models/user");
+const mongoose  = require("mongoose");
 
 let DUMMY_PLACES = [
   {
@@ -88,8 +89,27 @@ const createPlace = async (req, res, next) => {
     creator,
   });
 
+  let user;
   try {
-    await createdPlace.save();
+    user = await User.findById(creator);
+  } catch (err) {
+    return next(new HttpError("Find the creator failed", 500));
+  }
+
+  if (!user) {
+    return next(
+      new HttpError("Failed to create place because there is no creator"),
+      404
+    );
+  }
+
+  try {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    await createdPlace.save({ session: session });
+    user.places.push(createdPlace);
+    await user.save({ session: session});
+    await session.commitTransaction();
   } catch (err) {
     const error = new HttpError("Creating place failed, try again", 500);
     return next(error);
