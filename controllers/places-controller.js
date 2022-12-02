@@ -4,7 +4,7 @@ const { validationResult } = require("express-validator");
 const Place = require("../models/place");
 const getCoordsForAddress = require("../Util/location");
 const User = require("../models/user");
-const mongoose  = require("mongoose");
+const mongoose = require("mongoose");
 
 let DUMMY_PLACES = [
   {
@@ -108,7 +108,7 @@ const createPlace = async (req, res, next) => {
     session.startTransaction();
     await createdPlace.save({ session: session });
     user.places.push(createdPlace);
-    await user.save({ session: session});
+    await user.save({ session: session });
     await session.commitTransaction();
   } catch (err) {
     const error = new HttpError("Creating place failed, try again", 500);
@@ -159,14 +159,23 @@ const deletePlace = async (req, res, next) => {
   let place;
 
   try {
-    place = await Place.findById(placeId);
+    place = await Place.findById(placeId).populate("creator");
   } catch (err) {
     const error = new HttpError("Could not delete place", 500);
     return next(error);
   }
 
+  if (!place) {
+    return next(new HttpError("Could not find place for this id", 404));
+  }
+
   try {
-    await place.remove();
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    await place.remove({ session: session });
+    place.creator.places.pull(place);
+    await place.creator.save({ session: session });
+    await session.commitTransaction();
   } catch (err) {
     const error = new HttpError("Could not delete place", 500);
     return next(error);
