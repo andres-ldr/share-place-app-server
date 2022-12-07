@@ -9,7 +9,7 @@ const getUsers = async (req, res, next) => {
   } catch (err) {
     next(new HttpError("Fetching users fails, please try again later.", 500));
   }
-  res.json({ Users: users.map((user) => user.toObject({ getters: true })) });
+  res.json({ users: users.map((user) => user.toObject({ getters: true })) });
 };
 
 const signup = async (req, res, next) => {
