@@ -45,7 +45,9 @@ const getPlacesByUserId = async (req, res, next) => {
       new HttpError("Could not find places for the provided user id.", 404)
     );
   }
-  res.json({ places: places.map((place) => place.toObject({ getters: true })) });
+  res.json({
+    places: places.map((place) => place.toObject({ getters: true })),
+  });
 };
 
 const createPlace = async (req, res, next) => {
@@ -69,8 +71,7 @@ const createPlace = async (req, res, next) => {
     description,
     address,
     location: coordinates,
-    image:
-      "https://imgs.search.brave.com/SnvWNEOd2lWjt1L_dbLKgbHT5AOjOjpd44R0HYlko5I/rs:fit:800:1200:1/g:ce/aHR0cDovLzQuYnAu/YmxvZ3Nwb3QuY29t/Ly1LeURLdU5XYWIz/Yy9UYjFmYU9Vd3c3/SS9BQUFBQUFBQUZL/Yy95amREbTF5LWw2/by9zMTYwMC9lbXBp/cmUlMkJzdGF0ZS0l/MkJidWlsZGluZyUy/QjIuanBn",
+    image: req.file.path,
     creator,
   });
 
