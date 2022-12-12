@@ -41,8 +41,7 @@ const signup = async (req, res, next) => {
   const newUser = new User({
     name,
     email,
-    image:
-      "https://imgs.search.brave.com/e7tcMRl2HAyP1hs-0tEryj3dSiy1cqc0-KrLX8HCX58/rs:fit:800:533:1/g:ce/aHR0cHM6Ly90aHVt/YnMuZHJlYW1zdGlt/ZS5jb20vYi95b3Vu/Zy1idXNpbmVzc21l/bi1oYWlsaW5nLXRh/eGktYnVzaW5lc3Nt/YW4td2VhcmluZy1z/dWl0LWNhdGNoaW5n/LTkyNTA4MzQzLmpw/Zw",
+    image: req.file.path,
     password,
     places: [],
   });
