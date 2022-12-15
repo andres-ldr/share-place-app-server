@@ -114,13 +114,17 @@ const updatePlace = async (req, res, next) => {
     throw new HttpError("Invalid inputs passed, please your data", 422);
   }
 
-  //create our data's copy
   let place;
 
   try {
     place = await Place.findById(placeId);
   } catch (err) {
     const error = new HttpError("Could not update place.", 500);
+    return next(error);
+  }
+
+  if (place.creator.toString() !== req.userData.userId) {
+    const error = new HttpError("You are not allowed to update this item", 401);
     return next(error);
   }
 
