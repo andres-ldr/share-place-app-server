@@ -42,7 +42,7 @@ const signup = async (req, res, next) => {
 
   let hashPassword;
   try {
-    const hashedPassword = await bcrypt.hash(password, 12);
+    hashPassword = await bcrypt.hash(password, 12);
   } catch (err) {
     return next(new HttpError("Could not user, please try again.", 500));
   }
